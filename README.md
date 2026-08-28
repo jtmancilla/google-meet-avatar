@@ -8,16 +8,17 @@ El agente entra a la reunión como un participante bot con tu avatar en cámara,
 
 - Python 3.10 a 3.12
 - [uv](https://github.com/astral-sh/uv)
-- [LiveKit CLI](https://docs.livekit.io/home/cli/) (`lk`) para despachar trabajos
 - Claves de API de:
   - LiveKit (URL, API key y API secret)
   - LemonSlice
   - ElevenLabs
 
+El dispatch se hace con `dispatch.py` (incluido), por lo que **no se requiere instalar el LiveKit CLI**.
+
 ## Instalación
 
 ```bash
-cd 11-google-meet-avatar
+cd google-meet-avatar
 uv sync
 ```
 
@@ -53,18 +54,24 @@ uv run python agent.py dev
 
 ## Unir el avatar a un Google Meet
 
-Con el worker corriendo, crea un dispatch con el link de la reunión en el metadata:
+Con el worker corriendo, despacha el agente a la reunión con el script incluido (usa las variables del `.env`, no requiere LiveKit CLI):
+
+```bash
+uv run python dispatch.py "https://meet.google.com/zby-szeg-crc" --bot-name "tony"
+```
+
+- `meeting_url`: el link estándar del evento de calendario de Google Meet.
+- `--bot-name` (opcional, default `Mi Avatar`): nombre visible del bot en la reunión.
+- `--no-chat` (opcional): por defecto los mensajes del chat de la reunión se reenvían al agente; esta bandera lo desactiva.
+
+**Alternativa con LiveKit CLI** (si lo tienes instalado):
 
 ```bash
 lk dispatch create \
   --new-room \
   --agent-name meet-bot \
-  --metadata '{"meeting_url":"https://meet.google.com/abc-defg-hij", "bot_name": "Mi Avatar", "listen_to_meeting_chat": true}'
+  --metadata '{"meeting_url":"https://meet.google.com/zby-szeg-crc", "bot_name": "tony", "listen_to_meeting_chat": true}'
 ```
-
-- `meeting_url`: el link estándar del evento de calendario de Google Meet.
-- `bot_name` (opcional): nombre visible del bot en la reunión.
-- `listen_to_meeting_chat` (opcional, default `true`): reenvía los mensajes del chat de la reunión al agente.
 
 **Nota:** el bot entra al lobby de Meet y un participante humano debe **admitirlo** manualmente.
 
