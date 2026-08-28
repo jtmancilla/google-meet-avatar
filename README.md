@@ -45,7 +45,7 @@ uv sync
    | `LIVEKIT_URL` | [LiveKit Cloud](https://cloud.livekit.io) → tu proyecto → Settings → URL (`wss://...`) |
    | `LIVEKIT_API_KEY` | Mismo lugar → API Keys |
    | `LIVEKIT_API_SECRET` | Mismo lugar → API Keys |
-| `TTS_VOICE_ID` | (Opcional) ID de la voz (UUID). Explora voces en la [Cartesia Voice Library](https://cartesia.ai/voices) (deben ser voces *default*, no clonadas). Default: `9626c31c-bec5-4cca-baa8-f8ba9e84c8bc`. |
+   | `TTS_VOICE_ID` | (Opcional) ID de la voz (UUID). Explora voces en la [Cartesia Voice Library](https://cartesia.ai/voices) (deben ser voces *default*, no clonadas). Default: `9626c31c-bec5-4cca-baa8-f8ba9e84c8bc`. |
 
    STT, LLM y TTS van por **LiveKit Inference**, así que no necesitas cuentas de Deepgram, OpenAI ni Cartesia.
 
