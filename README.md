@@ -45,7 +45,7 @@ uv sync
    | `LIVEKIT_URL` | [LiveKit Cloud](https://cloud.livekit.io) → tu proyecto → Settings → URL (`wss://...`) |
    | `LIVEKIT_API_KEY` | Mismo lugar → API Keys |
    | `LIVEKIT_API_SECRET` | Mismo lugar → API Keys |
-| `TTS_VOICE_ID` | (Opcional) ID de la voz. Busca voces en la [ElevenLabs Voice Library](https://elevenlabs.io/voice-library) y copia el ID. Default: `pNInz6obpgDQGcFmaOIt` (Adam, voz masculina). Femenina: `cgSgspJ2msm6clMCkdW9` (Sarah). |
+| `TTS_VOICE_ID` | (Opcional) ID de la voz. Debe ser una voz **default** de ElevenLabs (las custom/de comunidad no funcionan vía LiveKit Inference). Default: `cgSgspJ2msm6clMCkdW9` (Sarah). Prueba IDs en la [ElevenLabs Voice Library](https://elevenlabs.io/voice-library). |
 
    STT, LLM y TTS van por **LiveKit Inference**, así que no necesitas cuentas de Deepgram, OpenAI ni ElevenLabs.
 
