@@ -14,7 +14,7 @@ from livekit.agents import (
     inference,
     utils,
 )
-from livekit.plugins import elevenlabs, lemonslice
+from livekit.plugins import lemonslice
 
 logger = logging.getLogger("meet-avatar")
 logger.setLevel(logging.INFO)
@@ -29,10 +29,6 @@ server = AgentServer()
 @server.rtc_session(agent_name=AGENT_NAME)
 async def entrypoint(ctx: JobContext):
     await ctx.connect()
-
-    voice_id = os.getenv("ELEVENLABS_VOICE_ID")
-    if voice_id is None:
-        raise ValueError("ELEVENLABS_VOICE_ID must be set")
 
     lemonslice_image_url = os.getenv("LEMONSLICE_IMAGE_URL")
     if lemonslice_image_url is None:
@@ -50,7 +46,11 @@ async def entrypoint(ctx: JobContext):
             extra_kwargs={"interim_results": False},
         ),
         llm=inference.LLM(model="google/gemma-4-31b-it"),
-        tts=elevenlabs.TTS(voice_id=voice_id, model="eleven_flash_v2_5"),
+        tts=inference.TTS(
+            model="elevenlabs/eleven_flash_v2_5",
+            voice="cgSgspJ2msm6clMCkdW9",
+            language="es",
+        ),
         turn_handling=TurnHandlingOptions(
             interruption={
                 "resume_false_interruption": False,

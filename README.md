@@ -45,8 +45,8 @@ uv sync
    | `LIVEKIT_URL` | [LiveKit Cloud](https://cloud.livekit.io) → tu proyecto → Settings → URL (`wss://...`) |
    | `LIVEKIT_API_KEY` | Mismo lugar → API Keys |
    | `LIVEKIT_API_SECRET` | Mismo lugar → API Keys |
-   | `ELEVENLABS_VOICE_ID` | [ElevenLabs](https://elevenlabs.io) → Voices → tu voz → ID |
-   | `ELEVEN_API_KEY` | ElevenLabs → Profile → API Key |
+
+   STT, LLM y TTS van por **LiveKit Inference**, así que no necesitas cuentas de Deepgram, OpenAI ni ElevenLabs.
 
    El archivo debe quedar sin espacios ni comillas, algo así:
 
@@ -56,8 +56,6 @@ uv sync
    LIVEKIT_URL=wss://mi-proyecto.livekit.cloud
    LIVEKIT_API_KEY=APIxxxx
    LIVEKIT_API_SECRET=secretxxxx
-   ELEVENLABS_VOICE_ID=21m00Tcm4TlvDq8ikWAM
-   ELEVEN_API_KEY=sk_yyyy
    ```
 
 ## Paso 4 — Encender el agente (terminal 1)
@@ -94,9 +92,9 @@ El bot aparecerá en el **lobby** de Google Meet pidiendo entrar. Un participant
 
 Revisa la terminal 1 (donde corre `agent.py`): los errores del pipeline aparecen ahí. Las causas más comunes son:
 
-- `ELEVEN_API_KEY` o `ELEVENLABS_VOICE_ID` incorrectos → la voz falla y el avatar nunca habla (ni siquiera el saludo inicial).
 - `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` de un proyecto distinto al de `LIVEKIT_URL` → el worker registra pero el dispatch no llega.
 - La imagen no es una URL pública → LemonSlice no puede descargarla. Verifica abriéndola en una ventana de incógnito.
+- LiveKit Inference no habilitado en tu proyecto → verifica en cloud.livekit.io → tu proyecto → Settings → Inference.
 
 **`command not found: uv`** → cierra y vuelve a abrir la terminal después de instalar uv (o reinicia la sesión para que cargue el PATH).
 
@@ -110,7 +108,7 @@ Optimizado para tiempos de respuesta rápidos:
 |-----------|-----------|
 | STT | Deepgram Nova-2, español (vía LiveKit Inference) |
 | LLM | Google Gemma 4 31B IT (`google/gemma-4-31b-it`, vía LiveKit Inference) |
-| TTS | ElevenLabs `eleven_flash_v2_5` |
+| TTS | ElevenLabs Flash v2.5 (vía LiveKit Inference) |
 | Avatar | LemonSlice |
 
 Para inglés, cambia `language="es"` a `"en"` en `agent.py` y ajusta las instrucciones del agente.
