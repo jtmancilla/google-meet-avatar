@@ -45,6 +45,7 @@ uv sync
    | `LIVEKIT_URL` | [LiveKit Cloud](https://cloud.livekit.io) → tu proyecto → Settings → URL (`wss://...`) |
    | `LIVEKIT_API_KEY` | Mismo lugar → API Keys |
    | `LIVEKIT_API_SECRET` | Mismo lugar → API Keys |
+| `TTS_VOICE_ID` | (Opcional) ID de la voz. Busca voces en la [ElevenLabs Voice Library](https://elevenlabs.io/voice-library) y copia el ID. Default: `pNInz6obpgDQGcFmaOIt` (Adam, voz masculina). Femenina: `cgSgspJ2msm6clMCkdW9` (Sarah). |
 
    STT, LLM y TTS van por **LiveKit Inference**, así que no necesitas cuentas de Deepgram, OpenAI ni ElevenLabs.
 
@@ -83,6 +84,13 @@ Opciones:
 ## Paso 6 — Admitir al bot
 
 El bot aparecerá en el **lobby** de Google Meet pidiendo entrar. Un participante humano debe **admitirlo** manualmente. Una vez admitido, el avatar se presenta solo y ya puedes hablarle.
+
+## Detener el bot
+
+Para terminar la sesión tienes dos opciones:
+
+- **Desde Meet:** en el panel de participantes, quita al bot de la llamada (como expulsar a cualquier invitado).
+- **Desde la terminal:** presiona `Ctrl+C` en la terminal donde corre `agent.py` (terminal 1). Esto detiene el worker por completo; si solo quieres sacar al bot de una reunión, usa la opción anterior.
 
 ---
 
