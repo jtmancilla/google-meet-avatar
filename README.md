@@ -47,6 +47,18 @@ uv sync
    | `LIVEKIT_API_SECRET` | Mismo lugar → API Keys |
    | `TTS_VOICE_ID` | (Opcional) ID de la voz (UUID). Explora voces en la [Cartesia Voice Library](https://cartesia.ai/voices) (deben ser voces *default*, no clonadas). Default: `9626c31c-bec5-4cca-baa8-f8ba9e84c8bc`. |
 
+   Variables de comportamiento (opcionales, tienen defaults):
+
+   | Variable | Qué hace |
+   |---|---|
+   | `AGENT_INSTRUCTIONS` | System prompt del agente. Si se define, reemplaza el default por completo. |
+   | `AVATAR_NAME` | Nombre del avatar (la "wake-word"). Default: `Tony`. |
+   | `AVATAR_GATE_ENABLED` | `true`/`false`. Activa el modo wake-word. Default: `true`. |
+   | `AVATAR_ACTIVATION_WINDOW_S` | Segundos que sigue atento tras hablarle. Default: `30`. |
+   | `AVATAR_CLOSING_PHRASES` | Frases de cierre separadas por comas (vuelve a silencio). |
+   | `AVATAR_AMBIENT_MAX_TURNS` | Máximo de mensajes ambientales guardados como contexto. Default: `10`. |
+   | `AVATAR_AMBIENT_LABEL` | Etiqueta de los mensajes ambientales. |
+
    STT, LLM y TTS van por **LiveKit Inference**, así que no necesitas cuentas de Deepgram, OpenAI ni Cartesia.
 
    El archivo debe quedar sin espacios ni comillas, algo así:
@@ -92,6 +104,27 @@ Para terminar la sesión tienes dos opciones:
 - **Desde Meet:** en el panel de participantes, quita al bot de la llamada (como expulsar a cualquier invitado).
 - **Desde la terminal:** presiona `Ctrl+C` en la terminal donde corre `agent.py` (terminal 1). Esto detiene el worker por completo; si solo quieres sacar al bot de una reunión, usa la opción anterior.
 
+## Modo wake-word (estilo Alexa)
+
+Por defecto el bot **escucha todo pero solo habla cuando se le dirige la palabra**, usando su nombre como activador:
+
+- **Activar:** dile algo como *"Oye Tony, ¿puedes ayudarnos?"* o *"Tony, ¿qué opinas?"*.
+- **Ventana de atención:** después de hablarle, sigue atento `AVATAR_ACTIVATION_WINDOW_S` segundos (default 30) sin necesidad de repetir el nombre. Cada turno renueva la ventana.
+- **Cerrar:** frases como *"gracias, eso era todo"* o *"ya puedes irte"* lo regresan a silencio de inmediato.
+- **Contexto ambiental:** aunque esté en silencio, guarda lo que se dice en la reunión (etiquetado, máximo los últimos `AVATAR_AMBIENT_MAX_TURNS` turnos) para tener contexto cuando sí le hablen.
+
+Para que responda a todo (comportamiento anterior), pon `AVATAR_GATE_ENABLED=false` en el `.env`.
+
+## Personalizar el comportamiento (system prompt)
+
+Las instrucciones del agente son 100% configurables por `AGENT_INSTRUCTIONS` en el `.env`, sin tocar código. El default es un asistente genérico en español consciente del modo wake-word.
+
+Ejemplo de un rol con contexto propio:
+
+```env
+AGENT_INSTRUCTIONS=Eres Tony, asistente de voz en el cierre de un taller. Responde en español, máximo 2 oraciones. Si te piden palabras finales, agradece a los participantes...
+```
+
 ---
 
 ## Problemas comunes
@@ -107,6 +140,14 @@ Revisa la terminal 1 (donde corre `agent.py`): los errores del pipeline aparecen
 **`command not found: uv`** → cierra y vuelve a abrir la terminal después de instalar uv (o reinicia la sesión para que cargue el PATH).
 
 **El bot se queda en el lobby** → alguien dentro de la reunión debe admitirlo; Meet no lo deja entrar solo.
+
+## Tests
+
+La lógica del wake-word tiene suite de tests (sin red ni servicios externos):
+
+```bash
+uv run pytest
+```
 
 ## Stack del agente
 
