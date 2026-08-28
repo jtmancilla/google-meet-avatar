@@ -1,0 +1,15 @@
+[project]
+name = "google-meet-avatar"
+version = "1.0.0"
+description = "Send a LemonSlice avatar into a Google Meet call via LiveKit Agents"
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "livekit-agents[lemonslice]>=1.6.5",
+    "livekit-plugins-openai>=1.6.5",
+    "livekit-plugins-elevenlabs>=1.6.5",
+    "python-dotenv>=1.2.1",
+]
+
+[tool.uv]
+package = false
