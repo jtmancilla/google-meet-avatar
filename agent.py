@@ -47,8 +47,8 @@ async def entrypoint(ctx: JobContext):
         ),
         llm=inference.LLM(model="google/gemma-4-31b-it"),
         tts=inference.TTS(
-            model="elevenlabs/eleven_flash_v2_5",
-            voice=os.getenv("TTS_VOICE_ID", "pNInz6obpgDQGcFmaOIt"),
+            model="cartesia/sonic-3",
+            voice=os.getenv("TTS_VOICE_ID", "9626c31c-bec5-4cca-baa8-f8ba9e84c8bc"),
             language="es",
         ),
         turn_handling=TurnHandlingOptions(

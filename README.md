@@ -45,9 +45,9 @@ uv sync
    | `LIVEKIT_URL` | [LiveKit Cloud](https://cloud.livekit.io) → tu proyecto → Settings → URL (`wss://...`) |
    | `LIVEKIT_API_KEY` | Mismo lugar → API Keys |
    | `LIVEKIT_API_SECRET` | Mismo lugar → API Keys |
-| `TTS_VOICE_ID` | (Opcional) ID de la voz. Debe ser una voz **default** de ElevenLabs (las custom/de comunidad no funcionan vía LiveKit Inference). Default: `cgSgspJ2msm6clMCkdW9` (Sarah). Prueba IDs en la [ElevenLabs Voice Library](https://elevenlabs.io/voice-library). |
+| `TTS_VOICE_ID` | (Opcional) ID de la voz (UUID). Explora voces en la [Cartesia Voice Library](https://cartesia.ai/voices) (deben ser voces *default*, no clonadas). Default: `9626c31c-bec5-4cca-baa8-f8ba9e84c8bc`. |
 
-   STT, LLM y TTS van por **LiveKit Inference**, así que no necesitas cuentas de Deepgram, OpenAI ni ElevenLabs.
+   STT, LLM y TTS van por **LiveKit Inference**, así que no necesitas cuentas de Deepgram, OpenAI ni Cartesia.
 
    El archivo debe quedar sin espacios ni comillas, algo así:
 
@@ -116,7 +116,7 @@ Optimizado para tiempos de respuesta rápidos:
 |-----------|-----------|
 | STT | Deepgram Nova-2, español (vía LiveKit Inference) |
 | LLM | Google Gemma 4 31B IT (`google/gemma-4-31b-it`, vía LiveKit Inference) |
-| TTS | ElevenLabs Flash v2.5 (vía LiveKit Inference) |
+| TTS | Cartesia Sonic 3 (vía LiveKit Inference) |
 | Avatar | LemonSlice |
 
 Para inglés, cambia `language="es"` a `"en"` en `agent.py` y ajusta las instrucciones del agente.
