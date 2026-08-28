@@ -12,7 +12,6 @@ from livekit.agents import (
     TurnHandlingOptions,
     cli,
     inference,
-    utils,
 )
 from livekit.plugins import lemonslice
 
@@ -82,10 +81,6 @@ async def entrypoint(ctx: JobContext):
         room=ctx.room,
         room_options=room_options,
     )
-
-    # Wait for the LemonSlice avatar (AGENT participant) before the first reply.
-    await utils.wait_for_agent(ctx.room)
-    session.generate_reply(instructions="Preséntate brevemente y ofrece tu ayuda.")
 
 
 if __name__ == "__main__":
