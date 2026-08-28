@@ -4,76 +4,103 @@ Envía un avatar de [LemonSlice](https://www.lemonslice.com/) a una llamada de *
 
 El agente entra a la reunión como un participante bot con tu avatar en cámara, escucha el audio de la reunión y responde con voz y animación de baja latencia. Basado en el ejemplo `07-livekit-zoom` de [lemonslice-examples](https://github.com/LemonSlice-ai/lemonslice-examples) (el mismo `join_meeting` también soporta Zoom, Teams y Webex).
 
-## Prerequisitos
-
-- Python 3.10 a 3.12
-- [uv](https://github.com/astral-sh/uv)
-- Claves de API de:
-  - LiveKit (URL, API key y API secret)
-  - LemonSlice
-  - ElevenLabs
-
-El dispatch se hace con `dispatch.py` (incluido), por lo que **no se requiere instalar el LiveKit CLI**.
-
-## Instalación
+## Paso 1 — Clonar el proyecto
 
 ```bash
+git clone https://github.com/jtmancilla/google-meet-avatar.git
 cd google-meet-avatar
+```
+
+Todos los comandos siguientes se ejecutan **dentro de esta carpeta**.
+
+## Paso 2 — Instalar dependencias
+
+Necesitas [uv](https://github.com/astral-sh/uv) (gestor de paquetes de Python). Si no lo tienes:
+
+```bash
+# macOS / Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Luego instala las dependencias del proyecto (crea el entorno virtual solo):
+
+```bash
 uv sync
 ```
 
-## Configuración
+## Paso 3 — Configurar las claves
 
-1. Copia las variables de entorno:
+1. Copia la plantilla de variables de entorno:
 
    ```bash
    cp .env.example .env
    ```
 
-2. Completa `.env`:
+2. Abre el archivo `.env` con cualquier editor y completa cada valor:
+
+   | Variable | Dónde se obtiene |
+   |---|---|
+   | `LEMONSLICE_API_KEY` | [Portal de LemonSlice](https://lemonslice.com) → API Keys |
+   | `LEMONSLICE_IMAGE_URL` | URL **pública** de la imagen del avatar. La del repo funciona: `https://raw.githubusercontent.com/jtmancilla/google-meet-avatar/main/assets/avatar.png` |
+   | `LIVEKIT_URL` | [LiveKit Cloud](https://cloud.livekit.io) → tu proyecto → Settings → URL (`wss://...`) |
+   | `LIVEKIT_API_KEY` | Mismo lugar → API Keys |
+   | `LIVEKIT_API_SECRET` | Mismo lugar → API Keys |
+   | `ELEVENLABS_VOICE_ID` | [ElevenLabs](https://elevenlabs.io) → Voices → tu voz → ID |
+   | `ELEVEN_API_KEY` | ElevenLabs → Profile → API Key |
+
+   El archivo debe quedar sin espacios ni comillas, algo así:
 
    ```env
-   LEMONSLICE_API_KEY=tu_lemonslice_api_key
-   LEMONSLICE_IMAGE_URL=https://ejemplo.com/tu-avatar.png
-   LIVEKIT_API_KEY=tu_livekit_api_key
-   LIVEKIT_API_SECRET=tu_livekit_api_secret
-   LIVEKIT_URL=wss://tu-proyecto.livekit.cloud
-   ELEVENLABS_VOICE_ID=tu_elevenlabs_voice_id
-   ELEVEN_API_KEY=tu_elevenlabs_api_key
+   LEMONSLICE_API_KEY=sk_abc123
+   LEMONSLICE_IMAGE_URL=https://raw.githubusercontent.com/jtmancilla/google-meet-avatar/main/assets/avatar.png
+   LIVEKIT_URL=wss://mi-proyecto.livekit.cloud
+   LIVEKIT_API_KEY=APIxxxx
+   LIVEKIT_API_SECRET=secretxxxx
+   ELEVENLABS_VOICE_ID=21m00Tcm4TlvDq8ikWAM
+   ELEVEN_API_KEY=sk_yyyy
    ```
 
-   `LEMONSLICE_IMAGE_URL` debe ser una URL pública de la imagen del avatar.
-
-## Ejecutar el worker
-
-Inicia el worker localmente (se registra con el nombre de agente `meet-bot`):
+## Paso 4 — Encender el agente (terminal 1)
 
 ```bash
 uv run python agent.py dev
 ```
 
-## Unir el avatar a un Google Meet
+Déjalo corriendo. Debes ver un mensaje indicando que el worker se registró como `meet-bot`. **No cierres esta terminal.**
 
-Con el worker corriendo, despacha el agente a la reunión con el script incluido (usa las variables del `.env`, no requiere LiveKit CLI):
+## Paso 5 — Enviar el avatar a la reunión (terminal 2)
 
-```bash
-uv run python dispatch.py "https://meet.google.com/zby-szeg-crc" --bot-name "tony"
-```
-
-- `meeting_url`: el link estándar del evento de calendario de Google Meet.
-- `--bot-name` (opcional, default `Mi Avatar`): nombre visible del bot en la reunión.
-- `--no-chat` (opcional): por defecto los mensajes del chat de la reunión se reenvían al agente; esta bandera lo desactiva.
-
-**Alternativa con LiveKit CLI** (si lo tienes instalado):
+Abre una **segunda terminal**, entra a la misma carpeta y ejecuta el dispatch con el link de tu reunión de Google Meet:
 
 ```bash
-lk dispatch create \
-  --new-room \
-  --agent-name meet-bot \
-  --metadata '{"meeting_url":"https://meet.google.com/zby-szeg-crc", "bot_name": "tony", "listen_to_meeting_chat": true}'
+cd google-meet-avatar
+uv run python dispatch.py "https://meet.google.com/abc-defg-hij" --bot-name "Mi Avatar"
 ```
 
-**Nota:** el bot entra al lobby de Meet y un participante humano debe **admitirlo** manualmente.
+Opciones:
+
+- `--bot-name "Nombre"` — nombre visible del bot en la reunión (default: `Mi Avatar`).
+- `--no-chat` — desactiva el reenvío de mensajes del chat de la reunión al agente (por defecto está activo).
+
+## Paso 6 — Admitir al bot
+
+El bot aparecerá en el **lobby** de Google Meet pidiendo entrar. Un participante humano debe **admitirlo** manualmente. Una vez admitido, el avatar se presenta solo y ya puedes hablarle.
+
+---
+
+## Problemas comunes
+
+**El avatar entra y se mueve, pero no habla ni responde.**
+
+Revisa la terminal 1 (donde corre `agent.py`): los errores del pipeline aparecen ahí. Las causas más comunes son:
+
+- `ELEVEN_API_KEY` o `ELEVENLABS_VOICE_ID` incorrectos → la voz falla y el avatar nunca habla (ni siquiera el saludo inicial).
+- `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` de un proyecto distinto al de `LIVEKIT_URL` → el worker registra pero el dispatch no llega.
+- La imagen no es una URL pública → LemonSlice no puede descargarla. Verifica abriéndola en una ventana de incógnito.
+
+**`command not found: uv`** → cierra y vuelve a abrir la terminal después de instalar uv (o reinicia la sesión para que cargue el PATH).
+
+**El bot se queda en el lobby** → alguien dentro de la reunión debe admitirlo; Meet no lo deja entrar solo.
 
 ## Stack del agente
 
@@ -93,4 +120,3 @@ Para inglés, cambia `language="es"` a `"en"` en `agent.py` y ajusta las instruc
 - [Guía oficial de LemonSlice para reuniones](https://lemonslice.com/docs/reference/zoom-meetings)
 - [Documentación de LiveKit Agents](https://docs.livekit.io/agents/)
 - [Integración LemonSlice + LiveKit](https://lemonslice.com/docs/livekit)
-- [LiveKit agent dispatch](https://docs.livekit.io/agents/build/dispatch/)
