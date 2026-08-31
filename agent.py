@@ -2,6 +2,7 @@ import json
 import logging
 import os
 from collections import deque
+from datetime import datetime
 
 from dotenv import load_dotenv
 
@@ -146,7 +147,19 @@ async def entrypoint(ctx: JobContext):
     )
     room_options = avatar.room_options()
 
-    agent = GatedAgent(instructions=AGENT_INSTRUCTIONS)
+    today = datetime.now()
+    days = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+    months = [
+        "enero", "febrero", "marzo", "abril", "mayo", "junio",
+        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+    ]
+    today_es = f"{days[today.weekday()]} {today.day} de {months[today.month - 1]} de {today.year}"
+    instructions = (
+        f"{AGENT_INSTRUCTIONS}\n\n"
+        f"La fecha de hoy es {today_es}. Úsala solo para ubicarte "
+        "temporalmente; no la menciones a menos que te la pregunten."
+    )
+    agent = GatedAgent(instructions=instructions)
 
     await session.start(
         agent=agent,
