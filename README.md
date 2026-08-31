@@ -41,7 +41,7 @@ uv sync
    | Variable | Dónde se obtiene |
    |---|---|
    | `LEMONSLICE_API_KEY` | [Portal de LemonSlice](https://lemonslice.com) → API Keys |
-   | `LEMONSLICE_IMAGE_URL` | URL **pública** de la imagen del avatar. La del repo funciona: `https://raw.githubusercontent.com/jtmancilla/google-meet-avatar/main/assets/avatar.png` |
+   | `LEMONSLICE_IMAGE_URL` | URL **pública** de la imagen del avatar. La del repo funciona: `https://raw.githubusercontent.com/jtmancilla/google-meet-avatar/main/assets/avatar_2.png` |
    | `LIVEKIT_URL` | [LiveKit Cloud](https://cloud.livekit.io) → tu proyecto → Settings → URL (`wss://...`) |
    | `LIVEKIT_API_KEY` | Mismo lugar → API Keys |
    | `LIVEKIT_API_SECRET` | Mismo lugar → API Keys |
@@ -65,7 +65,7 @@ uv sync
 
    ```env
    LEMONSLICE_API_KEY=sk_abc123
-   LEMONSLICE_IMAGE_URL=https://raw.githubusercontent.com/jtmancilla/google-meet-avatar/main/assets/avatar.png
+   LEMONSLICE_IMAGE_URL=https://raw.githubusercontent.com/jtmancilla/google-meet-avatar/main/assets/avatar_2.png
    LIVEKIT_URL=wss://mi-proyecto.livekit.cloud
    LIVEKIT_API_KEY=APIxxxx
    LIVEKIT_API_SECRET=secretxxxx
@@ -85,17 +85,17 @@ Abre una **segunda terminal**, entra a la misma carpeta y ejecuta el dispatch co
 
 ```bash
 cd google-meet-avatar
-uv run python dispatch.py "https://meet.google.com/abc-defg-hij" --bot-name "Mi Avatar"
+uv run python dispatch.py "https://meet.google.com/abc-defg-hij" --bot-name "Tony"
 ```
 
 Opciones:
 
-- `--bot-name "Nombre"` — nombre visible del bot en la reunión (default: `Mi Avatar`).
+- `--bot-name "Nombre"` — nombre visible del bot en la reunión (default: `Mi Avatar`). Usa el mismo valor de `AVATAR_NAME` para que los participantes sepan cómo llamarlo.
 - `--no-chat` — desactiva el reenvío de mensajes del chat de la reunión al agente (por defecto está activo).
 
 ## Paso 6 — Admitir al bot
 
-El bot aparecerá en el **lobby** de Google Meet pidiendo entrar. Un participante humano debe **admitirlo** manualmente. Una vez admitido, el avatar se presenta solo y ya puedes hablarle.
+El bot aparecerá en el **lobby** de Google Meet pidiendo entrar. Un participante humano debe **admitirlo** manualmente. Una vez admitido, el avatar **entra en silencio**: escucha la conversación y solo habla cuando alguien le dirige la palabra por su nombre (ver "Modo wake-word" más abajo).
 
 ## Detener el bot
 
@@ -131,10 +131,11 @@ AGENT_INSTRUCTIONS=Eres Tony, asistente de voz en el cierre de un taller. Respon
 
 **El avatar entra y se mueve, pero no habla ni responde.**
 
-Revisa la terminal 1 (donde corre `agent.py`): los errores del pipeline aparecen ahí. Las causas más comunes son:
+Primero descarta lo esperado: en modo wake-word el bot **entra en silencio por diseño** — dile algo por su nombre (ej. *"Oye Tony, ¿me escuchas?"*). Si aun así no responde, revisa la terminal 1 (donde corre `agent.py`): los errores del pipeline aparecen ahí. Las causas más comunes son:
 
 - `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` de un proyecto distinto al de `LIVEKIT_URL` → el worker registra pero el dispatch no llega.
 - La imagen no es una URL pública → LemonSlice no puede descargarla. Verifica abriéndola en una ventana de incógnito.
+- `TTS_VOICE_ID` con un ID que no existe en Cartesia (los IDs de ElevenLabs no sirven) → error `voice does not exist` en los logs.
 - LiveKit Inference no habilitado en tu proyecto → verifica en cloud.livekit.io → tu proyecto → Settings → Inference.
 
 **`command not found: uv`** → cierra y vuelve a abrir la terminal después de instalar uv (o reinicia la sesión para que cargue el PATH).
