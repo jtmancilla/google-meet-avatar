@@ -54,7 +54,10 @@ DEFAULT_INSTRUCTIONS = (
     f"Solo respondes cuando alguien te habla directamente usando tu nombre "
     f"({GATE_NAME}). Los mensajes etiquetados como \"{GATE_AMBIENT_LABEL} ...\" "
     "son contexto ambiental de la reunión: úsalos para entender de qué se "
-    "habla, pero nunca los respondas."
+    "habla, pero nunca los respondas.\n"
+    "\n"
+    "Si alguien solo te agradece, responde de forma minimalista, por ejemplo "
+    "\"Quedo atento\" o \"Aquí sigo\", sin extenderte ni devolver el agradecimiento."
 )
 
 AGENT_INSTRUCTIONS = os.getenv("AGENT_INSTRUCTIONS", DEFAULT_INSTRUCTIONS)
