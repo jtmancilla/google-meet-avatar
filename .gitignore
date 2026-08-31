@@ -13,6 +13,9 @@ __pycache__/
 # Logs
 *.log
 
+# Notas de sesiones generadas por send_summary
+memoria/
+
 # OS / editor
 .DS_Store
 .vscode/

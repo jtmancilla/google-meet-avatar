@@ -27,6 +27,7 @@ async def main() -> None:
     parser.add_argument("meeting_url", help="Full join URL of the meeting (Google Meet, Zoom, Teams, Webex)")
     parser.add_argument("--bot-name", default="Mi Avatar", help="Display name of the bot in the meeting")
     parser.add_argument("--no-chat", action="store_true", help="Do not relay meeting chat messages to the agent")
+    parser.add_argument("--objective", default=None, help="Objective of the session (included in the summary notes)")
     args = parser.parse_args()
 
     metadata = {
@@ -34,6 +35,8 @@ async def main() -> None:
         "bot_name": args.bot_name,
         "listen_to_meeting_chat": not args.no_chat,
     }
+    if args.objective:
+        metadata["objective"] = args.objective
 
     async with api.LiveKitAPI() as lkapi:
         room_name = f"meet-bot-{uuid.uuid4().hex[:8]}"

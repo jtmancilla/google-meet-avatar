@@ -115,6 +115,15 @@ Por defecto el bot **escucha todo pero solo habla cuando se le dirige la palabra
 
 Para que responda a todo (comportamiento anterior), pon `AVATAR_GATE_ENABLED=false` en el `.env`.
 
+## Notas de la sesión (send_summary)
+
+Pídele al final de la reunión algo como *"Tony, mándame el resumen"* y el agente genera un documento con **acciones acordadas, decisiones tomadas y pendientes de asignación**, guardado en `memoria/<codigo-del-meet>-<fecha>.md`.
+
+- El código del Meet (ej. `abc-defg-hij`) identifica el archivo.
+- La lógica de extracción es configurable con `SUMMARY_INSTRUCTIONS` en el `.env`.
+- El prompt default ignora saludos, opiniones y contexto; solo extrae acciones (con responsable y fecha si se mencionaron), decisiones finales y pendientes sin dueño. Nunca inventa datos.
+- Puedes pasar el objetivo de la sesión al despachar: `uv run python dispatch.py "<url>" --objective "Cierre de taller de IA"`.
+
 ## Personalizar el comportamiento (system prompt)
 
 Las instrucciones del agente son 100% configurables por `AGENT_INSTRUCTIONS` en el `.env`, sin tocar código. El default es un asistente genérico en español consciente del modo wake-word.
