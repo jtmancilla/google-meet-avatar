@@ -1,0 +1,21 @@
+# Compose file for the avatar worker.
+# Works with both `podman compose` and `docker compose`.
+#
+# Usage:
+#   podman compose up -d          # start in background
+#   podman compose logs -f        # follow logs
+#   podman compose down           # stop
+#   podman compose up -d --build  # rebuild after code changes
+
+services:
+  avatar-worker:
+    build:
+      context: .
+      dockerfile: Containerfile
+    container_name: avatar-worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      # Persist meeting notes outside the container.
+      - ./memoria:/app/memoria

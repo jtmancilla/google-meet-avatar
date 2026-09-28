@@ -122,7 +122,10 @@ class WakeWordGate:
             self._last_directed_at = now
             text = transcript
             if vocative:
-                text = transcript[vocative.end():].strip()
+                # Si solo dijeron el nombre ("Hola Tony"), conservar el
+                # transcript original: un mensaje vacío deja al LLM sin
+                # nada que responder y el avatar se queda en silencio.
+                text = transcript[vocative.end():].strip() or transcript
             return GateDecision(respond=True, text=text)
 
         return GateDecision(respond=False, text=f"{self.ambient_label} {transcript}")

@@ -95,6 +95,15 @@ class TestStrip:
         assert decision.respond is True
         assert decision.text == "y luego qué pasó"
 
+    @pytest.mark.parametrize("text", ["Hola Tony", "Tony", "oye Tony"])
+    def test_bare_greeting_keeps_original_text(self, text):
+        # Un saludo sin pregunta debe llegar completo al LLM; si el strip
+        # del vocativo deja "", el LLM recibe un turno vacío y no responde.
+        gate = make_gate()
+        decision = gate.process(text, now=0.0)
+        assert decision.respond is True
+        assert decision.text == text
+
 
 class TestStateMachine:
     def test_window_renews_on_each_directed_turn(self):

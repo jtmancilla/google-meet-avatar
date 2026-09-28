@@ -25,10 +25,16 @@ Avatar de voz (LemonSlice) que entra a Google Meet como participante, escucha la
 
 ## Archivos
 
-- `agent.py` — worker LiveKit, pipeline STT/LLM/TTS, `GatedAgent`, tool `send_summary`, carga de env.
+- `agent.py` — worker LiveKit, pipeline STT/LLM/TTS, `GatedAgent`, tool `send_summary`, carga de env. Acepta overrides per-dispatch vía metadata (`avatar_name`, `avatar_image_url`, `tts_voice_id`, `instructions`, `session_id`).
 - `gate.py` — máquina de estados wake-word (pura, testeable).
 - `notes.py` — extracción de meet code, render y guardado de notas (pura, testeable).
-- `dispatch.py` — crea room + dispatch con metadata (`meeting_url`, `bot_name`, `objective`).
+- `profiles.py` — catálogo de avatares (`Tony`, `Clau`, `Julius`) y prompts por universidad (`UP`, `TEC`, `UNAM`). El dispatch resuelve nombres → valores concretos; el agent no importa este módulo.
+- `dispatch.py` — crea room + dispatch con metadata. Acepta `--avatar`, `--universidad`, `--sesion`.
+- `Containerfile` — imagen multi-stage (builder + runtime) basada en `python:3.10-slim` + `uv`.
+- `compose.yaml` — servicio `avatar-worker`, monta `.env` y `memoria/`. Compatible con Podman y Docker.
+- `scripts/avatar.py` — script standalone para dispatch (self-contained, no requiere clonar el repo).
+- `scripts/setup-server.sh` — provisioning de instancia Ubuntu 24.04 (instala Podman, clona repo, levanta worker).
+- `scripts/.env.example` — plantilla de `.env` mínimo para el script standalone (solo 3 vars de LiveKit).
 - `tests/` — pytest puro (sin red, sin event loop; clock inyectado).
 - `assets/` — imágenes de referencia del avatar (servidas vía GitHub raw; cache ~5 min).
 
@@ -38,7 +44,15 @@ Avatar de voz (LemonSlice) que entra a Google Meet como participante, escucha la
 uv sync                        # instalar
 uv run pytest                  # tests (deben pasar todos antes de commit)
 uv run python agent.py dev     # worker
-uv run python dispatch.py "<meet-url>" --bot-name "Tony" [--objective "..."]
+uv run python dispatch.py "<meet-url>" --avatar "Tony" --universidad "UP" --sesion "01"
+
+# Contenedor (Podman o Docker)
+podman compose up -d --build   # construir imagen y levantar worker
+podman compose logs -f         # seguir logs
+podman compose down            # detener
+
+# Script standalone (lo que usa tu compañera)
+python scripts/avatar.py "<meet-url>" --avatar "Clau" --universidad "TEC" --sesion "03"
 ```
 
 ## Convenciones

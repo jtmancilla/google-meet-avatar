@@ -85,13 +85,17 @@ Abre una **segunda terminal**, entra a la misma carpeta y ejecuta el dispatch co
 
 ```bash
 cd google-meet-avatar
-uv run python dispatch.py "https://meet.google.com/abc-defg-hij" --bot-name "Tony"
+uv run python dispatch.py "https://meet.google.com/abc-defg-hij" --avatar "Tony" --universidad "UP" --sesion "01"
 ```
 
 Opciones:
 
-- `--bot-name "Nombre"` — nombre visible del bot en la reunión (default: `Mi Avatar`). Usa el mismo valor de `AVATAR_NAME` para que los participantes sepan cómo llamarlo.
+- `--avatar "Nombre"` — avatar a usar: `Tony`, `Clau` o `Julius` (default: `Tony`). Cada uno tiene su imagen y voz.
+- `--universidad "CÓDIGO"` — prompt adaptado a la universidad: `UP`, `TEC` o `UNAM` (default: `UP`).
+- `--sesion "ID"` — identificador de la sesión (aparece en el nombre del archivo de notas).
+- `--bot-name "Nombre"` — override del nombre visible en Meet (default: el nombre del avatar).
 - `--no-chat` — desactiva el reenvío de mensajes del chat de la reunión al agente (por defecto está activo).
+- `--objective "..."` — objetivo de la sesión (aparece en las notas generadas).
 
 ## Paso 6 — Admitir al bot
 

@@ -5,7 +5,8 @@ Replaces `lk dispatch create` so the project only needs uv + .env
 
 Usage:
     uv run python dispatch.py "https://meet.google.com/abc-defg-hij"
-    uv run python dispatch.py "https://meet.google.com/abc-defg-hij" --bot-name "Mi Avatar"
+    uv run python dispatch.py "https://meet.google.com/abc-defg-hij" --avatar Tony --universidad UP --sesion 1
+    uv run python dispatch.py "https://meet.google.com/abc-defg-hij" --avatar Clau --universidad TEC --sesion 3
 """
 
 import argparse
@@ -17,6 +18,8 @@ from dotenv import load_dotenv
 
 from livekit import api
 
+from profiles import AVATAR_NAMES, UNIVERSITY_NAMES, resolve_profile
+
 load_dotenv()
 
 AGENT_NAME = "meet-bot"
@@ -25,16 +28,44 @@ AGENT_NAME = "meet-bot"
 async def main() -> None:
     parser = argparse.ArgumentParser(description="Dispatch meet-bot into a meeting")
     parser.add_argument("meeting_url", help="Full join URL of the meeting (Google Meet, Zoom, Teams, Webex)")
-    parser.add_argument("--bot-name", default="Mi Avatar", help="Display name of the bot in the meeting")
+    parser.add_argument(
+        "--avatar",
+        choices=AVATAR_NAMES,
+        default="Tony",
+        help="Avatar to use (default: Tony)",
+    )
+    parser.add_argument(
+        "--universidad",
+        choices=UNIVERSITY_NAMES,
+        default="UP",
+        help="University profile — sets the system prompt (default: UP)",
+    )
+    parser.add_argument(
+        "--sesion",
+        default=None,
+        help="Session identifier (e.g. '01', '03'). Used in the notes filename.",
+    )
+    parser.add_argument("--bot-name", default=None, help="Override display name (default: avatar name)")
     parser.add_argument("--no-chat", action="store_true", help="Do not relay meeting chat messages to the agent")
     parser.add_argument("--objective", default=None, help="Objective of the session (included in the summary notes)")
     args = parser.parse_args()
 
+    name, image_url, voice_id, instructions = resolve_profile(
+        args.avatar, args.universidad,
+    )
+
     metadata = {
         "meeting_url": args.meeting_url,
-        "bot_name": args.bot_name,
+        "bot_name": args.bot_name or name,
         "listen_to_meeting_chat": not args.no_chat,
+        # Per-dispatch profile overrides (agent.py reads these from metadata).
+        "avatar_name": name,
+        "avatar_image_url": image_url,
+        "tts_voice_id": voice_id,
+        "instructions": instructions,
     }
+    if args.sesion:
+        metadata["session_id"] = args.sesion
     if args.objective:
         metadata["objective"] = args.objective
 
@@ -48,10 +79,13 @@ async def main() -> None:
                 metadata=json.dumps(metadata),
             )
         )
-        print(f"Dispatched '{AGENT_NAME}' into room '{room_name}'")
-        print(f"  meeting_url: {args.meeting_url}")
-        print(f"  bot_name:    {args.bot_name}")
-        print(f"  dispatch id: {dispatch.id}")
+        print(f"✅ Dispatched '{name}' into room '{room_name}'")
+        print(f"  meeting_url:  {args.meeting_url}")
+        print(f"  avatar:       {name}")
+        print(f"  universidad:  {args.universidad.upper()}")
+        if args.sesion:
+            print(f"  sesión:       {args.sesion}")
+        print(f"  dispatch id:  {dispatch.id}")
 
 
 if __name__ == "__main__":
