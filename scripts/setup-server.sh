@@ -27,12 +27,11 @@ echo "=== 3/4  Checking .env ==="
 if [ ! -f .env ]; then
     cp .env.example .env
     echo ""
-    echo "  ⚠️  Created .env from template.  Edit it with your API keys:"
+    echo "  [INFO] Created .env from template. Edit it with your API keys:"
     echo "     nano $HOME/google-meet-avatar/.env"
     echo ""
     echo "  Required variables:"
     echo "    LEMONSLICE_API_KEY"
-    echo "    LEMONSLICE_IMAGE_URL   (optional — profiles inject it per dispatch)"
     echo "    LIVEKIT_URL"
     echo "    LIVEKIT_API_KEY"
     echo "    LIVEKIT_API_SECRET"
@@ -46,7 +45,7 @@ echo "=== 4/4  Building and starting the worker ==="
 podman compose up -d --build
 
 echo ""
-echo "✅  Worker is running!  Useful commands:"
+echo "[OK] Worker is running! Useful commands:"
 echo "  podman compose logs -f        # follow logs"
 echo "  podman compose restart        # restart after .env changes"
 echo "  podman compose down           # stop"
