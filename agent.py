@@ -187,30 +187,54 @@ async def entrypoint(ctx: JobContext):
     if not meeting_url:
         raise ValueError("meeting_url must be provided in job metadata")
 
-    # Resolucion de perfil institucional y voz (Single Source of Truth)
-    req_avatar = meta.get("avatar") or meta.get("avatar_name") or GATE_NAME
-    req_uni = meta.get("universidad") or meta.get("university")
+    # Identificar si el dispatch envio un avatar o universidad especificos
+    dispatch_avatar = meta.get("avatar") or meta.get("avatar_name")
+    dispatch_uni = meta.get("universidad") or meta.get("university")
+
+    # Resolver perfil (Single Source of Truth)
+    req_avatar = dispatch_avatar or GATE_NAME
+    req_uni = dispatch_uni or "UP"
 
     resolved_name, resolved_image, resolved_voice, resolved_instructions = resolve_profile(
         avatar_name=req_avatar,
         university=req_uni,
     )
 
-    # Overrides explicitos por metadata o variables de entorno
-    effective_name = meta.get("avatar_name") or meta.get("bot_name") or resolved_name
-    effective_image = (
-        meta.get("avatar_image_url")
-        or os.getenv("LEMONSLICE_IMAGE_URL")
-        or resolved_image
-    )
-    raw_voice = meta.get("tts_voice_id") or meta.get("voice") or os.getenv("TTS_VOICE_ID")
-    effective_voice = get_voice_id(raw_voice) if raw_voice else resolved_voice
+    # 1. Nombre visible del bot:
+    effective_name = meta.get("bot_name") or resolved_name
 
-    effective_instructions = (
-        meta.get("instructions")
-        or os.getenv("AGENT_INSTRUCTIONS")
-        or resolved_instructions
-    )
+    # 2. Imagen del avatar:
+    # Prioridad: override explicito en metadata -> imagen del perfil si se pidio avatar -> .env -> imagen del perfil por default
+    if meta.get("avatar_image_url"):
+        effective_image = meta["avatar_image_url"]
+    elif dispatch_avatar:
+        effective_image = resolved_image
+    else:
+        effective_image = os.getenv("LEMONSLICE_IMAGE_URL") or resolved_image
+
+    if not effective_image:
+        raise ValueError(
+            "No se encontro imagen de avatar. Define avatar en dispatch o LEMONSLICE_IMAGE_URL en .env"
+        )
+
+    # 3. Voz TTS:
+    # Prioridad: override explicito en metadata -> voz del perfil si se pidio avatar -> .env -> voz del perfil por default
+    raw_override_voice = meta.get("tts_voice_id") or meta.get("voice")
+    if raw_override_voice:
+        effective_voice = get_voice_id(raw_override_voice)
+    elif dispatch_avatar:
+        effective_voice = resolved_voice
+    else:
+        effective_voice = get_voice_id(os.getenv("TTS_VOICE_ID")) if os.getenv("TTS_VOICE_ID") else resolved_voice
+
+    # 4. Instrucciones / Prompt institucional:
+    # Prioridad: override explicito en metadata -> prompt resuelto si se pidio uni/avatar -> .env -> prompt resuelto por default
+    if meta.get("instructions"):
+        effective_instructions = meta["instructions"]
+    elif dispatch_uni or dispatch_avatar:
+        effective_instructions = resolved_instructions
+    else:
+        effective_instructions = os.getenv("AGENT_INSTRUCTIONS") or resolved_instructions
 
     # Session ID (e.g. "sesion-03") — prefixed to meet code for notes filenames.
     session_id = meta.get("session_id")
@@ -222,6 +246,14 @@ async def entrypoint(ctx: JobContext):
         "entrypoint: name=%s image=%s voice=%s session=%s",
         effective_name, effective_image, effective_voice, session_id,
     )
+    print(f"\n--- Sesion iniciada ---")
+    print(f"  Avatar:      {effective_name}")
+    print(f"  Imagen:      {effective_image}")
+    print(f"  Voz ID:      {effective_voice}")
+    print(f"  Universidad: {req_uni}")
+    if session_id:
+        print(f"  Sesion ID:   {session_id}")
+    print(f"-----------------------\n")
 
     session = AgentSession(
         stt=inference.STT(
