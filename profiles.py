@@ -5,13 +5,16 @@ El worker (agent.py) importa este modulo para resolver la metadata enviada por d
 """
 
 import os
+from typing import Any
 
 # ---------------------------------------------------------------------------
 # Catalogo de voces Cartesia (espanol mexicano)
 # ---------------------------------------------------------------------------
 VOICES: dict[str, str] = {
-    "mateo": os.getenv("VOICE_MATEO_ID", "9d8c6b2e-0a23-4a15-ae1b-121d5b5af417"),  # Masculina es-MX
-    "daniela": os.getenv("VOICE_DANIELA_ID", "5c5ad5e7-1020-476b-8b91-fdcbe9cc313c"),  # Femenina es-MX
+    # "Mexican Man" oficial de Cartesia
+    "mateo": os.getenv("VOICE_MATEO_ID", "15d0c2e2-8d29-44c3-be23-d585d5f154a1"),
+    # "Mexican Woman" oficial de Cartesia
+    "daniela": os.getenv("VOICE_DANIELA_ID", "5c5ad5e7-1020-476b-8b91-fdcbe9cc313c"),
 }
 
 DEFAULT_VOICE_NAME = "mateo"
@@ -27,25 +30,29 @@ def get_voice_id(voice_name_or_id: str | None) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Catalogo de avatares: nombre -> imagen de referencia + voz
+# Catalogo de avatares: nombre -> imagen de referencia + voz + variantes foneticas
 # ---------------------------------------------------------------------------
 _REPO_ASSETS = (
     "https://raw.githubusercontent.com/jtmancilla/google-meet-avatar"
     "/main/assets"
 )
 
-AVATARS: dict[str, dict[str, str]] = {
+AVATARS: dict[str, dict[str, Any]] = {
     "Tony": {
         "image_url": f"{_REPO_ASSETS}/avatar_tony.png",
         "voice": "mateo",
+        "aliases": ["Tony", "Toni"],
     },
     "Clau": {
         "image_url": f"{_REPO_ASSETS}/avatar_clau.jpg",
         "voice": "daniela",
+        "aliases": ["Clau", "Claudia"],
     },
     "Julius": {
         "image_url": f"{_REPO_ASSETS}/avatar_julius.jpg",
         "voice": "mateo",
+        # Variantes foneticas transcritas por el modelo de voz en espanol
+        "aliases": ["Julius", "Yulius", "Llulius", "Julio", "Yulio"],
     },
 }
 
@@ -124,11 +131,11 @@ UNIVERSITY_NAMES = ["UP", "TEC", "UNAM"]
 def resolve_profile(
     avatar_name: str | None = None,
     university: str | None = None,
-) -> tuple[str, str, str, str]:
+) -> tuple[str, str, str, str, list[str]]:
     """Resuelve un perfil nombrado en sus valores concretos.
 
     Returns:
-        tuple: (display_name, image_url, voice_id, instructions)
+        tuple: (display_name, image_url, voice_id, instructions, aliases)
     """
     raw_name = (avatar_name or "Tony").strip()
     key = raw_name.capitalize()
@@ -148,5 +155,6 @@ def resolve_profile(
     voice_key = avatar["voice"]
     voice_id = get_voice_id(voice_key)
     instructions = UNIVERSITIES[uni].replace("{name}", key)
+    aliases = list(avatar.get("aliases", []))
 
-    return key, avatar["image_url"], voice_id, instructions
+    return key, avatar["image_url"], voice_id, instructions, aliases

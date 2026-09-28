@@ -62,6 +62,7 @@ class WakeWordGate:
     def __init__(
         self,
         name: str,
+        aliases: list[str] | None = None,
         window_s: float = 30.0,
         closing_phrases: list[str] | None = None,
         ambient_max_turns: int = 10,
@@ -69,6 +70,7 @@ class WakeWordGate:
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self.name = name
+        self.aliases = aliases or []
         self.window_s = window_s
         self.closing_phrases = [_normalize_for_phrases(p.strip()) for p in (closing_phrases or []) if p.strip()]
         self.ambient_max_turns = ambient_max_turns
@@ -78,10 +80,11 @@ class WakeWordGate:
         self._active = False
         self._last_directed_at: float = 0.0
 
-        name_pat = _tolerant(name)
+        all_names = [name] + [a for a in self.aliases if a and a != name]
+        names_pat = "|".join(_tolerant(n) for n in all_names)
         vocatives = "|".join(_tolerant(w) for w in ("oye", "hey", "hola", "ok"))
-        self._vocative_re = re.compile(rf"^(?:{vocatives})?\s*{name_pat}\b[,:;]?\s*", re.IGNORECASE)
-        self._mention_re = re.compile(rf"\b{name_pat}\b", re.IGNORECASE)
+        self._vocative_re = re.compile(rf"^(?:{vocatives})?\s*(?:{names_pat})\b[,:;]?\s*", re.IGNORECASE)
+        self._mention_re = re.compile(rf"\b(?:{names_pat})\b", re.IGNORECASE)
 
     @property
     def active(self) -> bool:

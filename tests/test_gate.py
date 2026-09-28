@@ -157,3 +157,17 @@ class TestClockInjection:
         gate.process("oye Tony, hola")  # uses 100.0
         d = gate.process("¿sigues ahí?")  # uses 200.0 -> window expired (100 > 30)
         assert d.respond is False
+
+
+class TestAliases:
+    def test_aliases_trigger_activation(self):
+        gate = WakeWordGate(name="Julius", aliases=["Yulius", "Julio", "Yulio"])
+        d = gate.process("Hola Yulius", now=0.0)
+        assert d.respond is True
+        assert gate.active is True
+
+    def test_aliases_in_vocative(self):
+        gate = WakeWordGate(name="Julius", aliases=["Yulius", "Julio", "Yulio"])
+        d = gate.process("Oye Julio, ¿qué opinas?", now=0.0)
+        assert d.respond is True
+        assert d.text == "¿qué opinas?"

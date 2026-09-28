@@ -103,11 +103,13 @@ class GatedAgent(Agent):
         meet_code: str = "meeting",
         objective: str | None = None,
         gate_name: str | None = None,
+        gate_aliases: list[str] | None = None,
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
         self._gate = WakeWordGate(
             name=gate_name or GATE_NAME,
+            aliases=gate_aliases,
             window_s=GATE_WINDOW_S,
             closing_phrases=GATE_CLOSING_PHRASES,
             ambient_max_turns=GATE_AMBIENT_MAX_TURNS,
@@ -195,7 +197,7 @@ async def entrypoint(ctx: JobContext):
     req_avatar = dispatch_avatar or GATE_NAME
     req_uni = dispatch_uni or "UP"
 
-    resolved_name, resolved_image, resolved_voice, resolved_instructions = resolve_profile(
+    resolved_name, resolved_image, resolved_voice, resolved_instructions, resolved_aliases = resolve_profile(
         avatar_name=req_avatar,
         university=req_uni,
     )
@@ -302,6 +304,7 @@ async def entrypoint(ctx: JobContext):
         meet_code=meet_code,
         objective=meta.get("objective"),
         gate_name=effective_name,
+        gate_aliases=resolved_aliases,
     )
 
     await session.start(
