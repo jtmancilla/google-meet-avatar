@@ -38,6 +38,11 @@ logger.setLevel(logging.INFO)
 
 load_dotenv()
 
+# Sanitizar comillas residuales que inyectan algunos manejadores de contenedores (Podman/Docker)
+for _k, _v in list(os.environ.items()):
+    if _v and len(_v) >= 2 and ((_v[0] == '"' and _v[-1] == '"') or (_v[0] == "'" and _v[-1] == "'")):
+        os.environ[_k] = _v[1:-1]
+
 AGENT_NAME = "meet-bot"
 
 # --- Configuración vía variables de entorno (ver .env.example) ---
