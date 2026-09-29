@@ -44,15 +44,15 @@ def test_resolve_profile_clau_tec():
     assert "Claudia" in aliases
 
 
-def test_resolve_profile_julius_unam():
-    name, image_url, voice_id, instructions, aliases = resolve_profile("Julius", "UNAM")
-    assert name == "Julius"
-    assert image_url == AVATARS["Julius"]["image_url"]
+def test_resolve_profile_ricardo_unam():
+    name, image_url, voice_id, instructions, aliases = resolve_profile("Ricardo", "UNAM")
+    assert name == "Ricardo"
+    assert image_url == AVATARS["Ricardo"]["image_url"]
     assert voice_id == VOICES["mateo"]
-    assert "Eres Julius" in instructions
+    assert "Eres Ricardo" in instructions
     assert "Universidad Nacional Autonoma de Mexico" in instructions
-    assert "Yulius" in aliases
-    assert "Julio" in aliases
+    assert "Richie" in aliases
+    assert "Richard" in aliases
 
 
 def test_resolve_profile_invalid_avatar():

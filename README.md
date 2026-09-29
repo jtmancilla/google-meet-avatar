@@ -90,7 +90,7 @@ uv run python dispatch.py "https://meet.google.com/abc-defg-hij" --avatar "Tony"
 
 Opciones:
 
-- `--avatar "Nombre"` — avatar a usar: `Tony`, `Clau` o `Julius` (default: `Tony`). Cada uno tiene su imagen y voz.
+- `--avatar "Nombre"` — avatar a usar: `Tony`, `Clau` o `Ricardo` (default: `Tony`). Cada uno tiene su imagen y voz.
 - `--universidad "CÓDIGO"` — prompt adaptado a la universidad: `UP`, `TEC` o `UNAM` (default: `UP`).
 - `--sesion "ID"` — identificador de la sesión (aparece en el nombre del archivo de notas).
 - `--bot-name "Nombre"` — override del nombre visible en Meet (default: el nombre del avatar).

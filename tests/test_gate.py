@@ -161,13 +161,13 @@ class TestClockInjection:
 
 class TestAliases:
     def test_aliases_trigger_activation(self):
-        gate = WakeWordGate(name="Julius", aliases=["Yulius", "Julio", "Yulio"])
-        d = gate.process("Hola Yulius", now=0.0)
+        gate = WakeWordGate(name="Ricardo", aliases=["Richie", "Richard"])
+        d = gate.process("Hola Richie", now=0.0)
         assert d.respond is True
         assert gate.active is True
 
     def test_aliases_in_vocative(self):
-        gate = WakeWordGate(name="Julius", aliases=["Yulius", "Julio", "Yulio"])
-        d = gate.process("Oye Julio, ¿qué opinas?", now=0.0)
+        gate = WakeWordGate(name="Ricardo", aliases=["Richie", "Richard"])
+        d = gate.process("Oye Richard, ¿qué opinas?", now=0.0)
         assert d.respond is True
         assert d.text == "¿qué opinas?"

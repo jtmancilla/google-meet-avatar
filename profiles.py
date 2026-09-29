@@ -48,11 +48,10 @@ AVATARS: dict[str, dict[str, Any]] = {
         "voice": "daniela",
         "aliases": ["Clau", "Claudia"],
     },
-    "Julius": {
-        "image_url": f"{_REPO_ASSETS}/avatar_julius.jpg",
+    "Ricardo": {
+        "image_url": f"{_REPO_ASSETS}/avatar_ricardo.jpg",
         "voice": "mateo",
-        # Variantes foneticas transcritas por el modelo de voz en espanol
-        "aliases": ["Julius", "Yulius", "Llulius", "Julio", "Yulio"],
+        "aliases": ["Ricardo", "Richie", "Richard"],
     },
 }
 

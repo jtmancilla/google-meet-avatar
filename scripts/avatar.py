@@ -25,7 +25,7 @@ from livekit import api
 load_dotenv()
 
 AGENT_NAME = "meet-bot"
-VALID_AVATARS = ["Tony", "Clau", "Julius"]
+VALID_AVATARS = ["Tony", "Clau", "Ricardo"]
 VALID_UNIVERSITIES = ["UP", "TEC", "UNAM"]
 
 
@@ -36,7 +36,7 @@ async def main() -> None:
         "--avatar",
         choices=VALID_AVATARS,
         default="Tony",
-        help="Avatar a utilizar (Tony, Clau, Julius)",
+        help="Avatar a utilizar (Tony, Clau, Ricardo)",
     )
     parser.add_argument(
         "--universidad",
