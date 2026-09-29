@@ -12,6 +12,7 @@ set -euo pipefail
 echo "=== 1/4  Installing system packages ==="
 sudo apt-get update -qq
 sudo apt-get install -y -qq git podman podman-compose
+sudo systemctl enable --now podman-restart || true
 
 echo "=== 2/4  Cloning the repository ==="
 if [ -d "$HOME/google-meet-avatar" ]; then
